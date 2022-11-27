@@ -11,7 +11,6 @@ import reloadicon from "../../assets/images/reload.svg";
 import gameBeginSound from "../../assets/audios/entergame.wav";
 const MultiPlayer = () => {
   // initial cell states
-  const [username, setUserName] = useState("");
   const [cells, setCells] = useState([
     { id: 1, state: "initial" },
     { id: 2, state: "initial" },
@@ -26,17 +25,64 @@ const MultiPlayer = () => {
 
     { id: 9, state: "initial" },
   ]);
+  const [gameState, setGameState] = useState({
+    gameOver: false,
+    winner: "none",
+    winningCells: null,
+  });
+  const [username, setUserName] = useState("");
+  const [players, setPlayers] = useState([
+    {
+      name: "gg",
+      mark: "X",
+    },
+    {
+      name: "mu",
+      mark: "O",
+    },
+  ]);
+  const [me, setMe] = useState(null);
+  const [currentTurn, setCurrentTurn] = useState("gg");
 
   const navigate = useNavigate();
   const location = useLocation();
   const [startGame, setStartGame] = useState(false);
   //function to find weather X or O should go first
-
-  const [currentUserIcon, setCurrentUserIcon] = useState("");
-
   const clearHistory = () => {
     window.history.replaceState({}, document.title);
   };
+  const [titleText, setTitleText] = useState("");
+
+  useEffect(() => {
+    if (players && players.length > 0) {
+      let me = players[0].name === username ? players[0] : players[1];
+      setMe(me);
+    }
+  }, [players]);
+
+  useEffect(() => {
+    socket.on("start-game", ({ players, firstTurn }) => {
+      setPlayers(players);
+
+      setCurrentTurn(firstTurn);
+      let titleText = (players[0].name + " X " + players[1].name).toUpperCase();
+      setTitleText(titleText);
+      setStartGame(true);
+      const audio = new Audio();
+      audio.src = gameBeginSound;
+      audio.play();
+
+      // toast to notify which player to go first
+
+      setTimeout(() => {
+        toast.success(`Player ${currentTurn} First!`);
+      }, 30);
+    });
+
+    return () => {
+      socket.off("start-game");
+    };
+  }, []);
 
   const handleConnectionLost = () => {
     setTimeout(() => {
@@ -47,7 +93,6 @@ const MultiPlayer = () => {
     }, 30);
   };
 
-  const [titleText, setTitleText] = useState("");
   useEffect(() => {
     if (location.state && location.state.from === "/roomportal") {
       setUserName(location.state.username);
@@ -66,6 +111,12 @@ const MultiPlayer = () => {
       handleConnectionLost();
     });
 
+    socket.on("toggle-turn", () => {
+      setCurrentTurn((prevTurn) =>
+        prevTurn === players[0].name ? players[1].name : players[0].name
+      );
+    });
+
     socket.on("room-created", () => {
       setTimeout(() => {
         toast.success("Room created! ask your friend to join!");
@@ -75,37 +126,21 @@ const MultiPlayer = () => {
       toast.error("Room full, cannot join");
     });
 
-    socket.on("start-game", ({ usernames, firstTurn }) => {
-      setCurrentUserIcon(firstTurn);
-      setTitleText(usernames.join(" X ").toUpperCase());
-      setStartGame(true);
-      const audio = new Audio();
-      audio.src = gameBeginSound;
-      audio.play();
-
-      //toast to notify which player to go first
-
-      setTimeout(() => {
-        toast.success(`Player ${currentUserIcon} First!`);
-      }, 30);
+    socket.on("player-move", (updatedcells) => {
+      setCells([...JSON.parse(JSON.stringify(updatedcells))]);
     });
 
     //cleanup listeners
     return () => {
       socket.off("room-created");
       socket.off("room-full");
-      socket.off("start-game");
-      socket.off("create-or-join-room");
       socket.off("terminate-session");
+      socket.off("player-move");
+      socket.off("toggle-turn");
     };
   }, []);
 
   // state to keep track of weather game ended,and if so,winners, winning cells
-  const [gameState, setGameState] = useState({
-    gameOver: false,
-    winner: "none",
-    winningCells: null,
-  });
 
   //each time a cell state is changed check for win/draw
   useEffect(() => {
@@ -144,8 +179,8 @@ const MultiPlayer = () => {
       cell2.state === cell3.state &&
       cell1.state !== "initial"
     ) {
-      let winner = cell1.state.toUpperCase();
-      toast.success(`Player ${winner} wins!`);
+      let winner = username.toUpperCase();
+      toast.success(`${winner} wins!`);
       setGameState({
         gameOver: true,
         winner,
@@ -158,40 +193,33 @@ const MultiPlayer = () => {
 
   //function to change a cells state by id;passed to each cell
   const changeCellState = (id, newstate) => {
-    let updatedcells = cells.map((cell) => {
-      if (cell.id === id) {
-        return { ...cell, state: newstate };
-      }
-
-      return cell;
-    });
-
-    setCells(updatedcells);
+    socket.emit("player-move", { cells, id, newstate });
+    socket.emit("toggle-turn");
   };
 
-  if (startGame) {
+  if (startGame && players.length === 2) {
     return (
       <>
+        <h1>{currentTurn}</h1>
         <div className="main-container">
           <h1 className="game-title">
             {gameState.gameOver
               ? gameState.winner === "none"
                 ? "Draw"
-                : `Player ${gameState.winner} Wins 🥇`
+                : `${gameState.winner} Wins 🥇`
               : `${titleText}`}
           </h1>
           <div className="game-container">
             {cells.map((cell) => (
               <Cell
-                onClick={() => {
-                  console.log("ff");
-                }}
+                currentTurn={currentTurn}
                 gameState={gameState}
                 id={cell.id}
                 changeCellState={changeCellState}
-                setCurrentUserIcon={setCurrentUserIcon}
-                currentUserIcon={currentUserIcon}
+                username={username}
                 key={cell.id}
+                me={me}
+                state={cell.state}
               />
             ))}
           </div>
@@ -209,6 +237,7 @@ const MultiPlayer = () => {
                 src={githubicon}
                 alt="github icon"
                 onClick={() => {
+                  console.log(currentTurn);
                   console.log(cells);
                 }}
               />

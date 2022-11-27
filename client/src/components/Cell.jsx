@@ -1,16 +1,17 @@
 import XImage from "../assets/images/XImage.png";
 import OImage from "../assets/images/OImage.png";
 import { useState } from "react";
-import { useEffect } from "react";
 import "./Cell.css";
+import toast from "react-hot-toast";
 const Cell = ({
   gameState,
-  currentUserIcon,
-  setCurrentUserIcon,
   changeCellState,
   id,
+  currentTurn,
+  username,
+  me,
+  state,
 }) => {
-  const [currentIcon, setCurrentIcon] = useState("");
   //state for giving apprporiate backgroundColor for cells
   const [isHovering, setIsHovering] = useState(false);
 
@@ -22,11 +23,6 @@ const Cell = ({
     setIsHovering(false);
   };
 
-  useEffect(() => {
-    if (currentIcon === "") return;
-
-    changeCellState(id, currentIcon);
-  }, [currentIcon]);
   return (
     <div
       onMouseEnter={handleMouseEnter}
@@ -40,16 +36,17 @@ const Cell = ({
             : "#263238",
       }}
       onClick={() => {
-        if (currentIcon !== "" || gameState.gameOver) return;
-        setCurrentIcon(currentUserIcon);
-
-        if (currentUserIcon === "X") setCurrentUserIcon("O");
-        else setCurrentUserIcon("X");
+        if (state !== "initial" || gameState.gameOver) return;
+        if (currentTurn !== username) {
+          toast.error("Not your turn!");
+          return;
+        }
+        changeCellState(id, me.mark);
       }}
       className="cell"
     >
-      {currentIcon !== "" && (
-        <img src={currentIcon === "X" ? XImage : OImage} alt="xf" height={60} />
+      {state !== "initial" && (
+        <img src={state === "X" ? XImage : OImage} alt="mark" height={60} />
       )}
     </div>
   );

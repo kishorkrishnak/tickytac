@@ -22,7 +22,6 @@ body {
   grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
 }
 
-
 .btn-X-icon {
   stroke: #fc4747;
   height: 65px;
@@ -46,8 +45,6 @@ body {
     gap: 3px;
     grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
   }
-
-  
 }
 
 .main-container {
@@ -89,8 +86,6 @@ body {
 .credits svg {
   margin-bottom: 2px;
 }
-
-
 
 .credits a {
   text-decoration: none;
