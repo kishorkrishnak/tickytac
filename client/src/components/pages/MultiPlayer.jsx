@@ -1,35 +1,77 @@
 import "./SinglePlayer.css";
 import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { socket } from "../../socket";
 import Cell from "../Cell";
 import githubicon from "../../assets/images/github.svg";
+import { useNavigate } from 'react-router-dom'
+import { BallTriangle } from 'react-loading-icons'
 import reloadicon from "../../assets/images/reload.svg";
-
+import gameBeginSound from '../../assets/audios/entergame.wav'
 const MultiPlayer = () => {
+    const navigate = useNavigate()
+
+    const location = useLocation()
     const [startGame, setStartGame] = useState(false);
     //function to find weather X or O should go first
     const randomFirstTurn = () => {
         return Math.floor(Math.random() * 3) === 0 ? "X" : "O";
     };
+    const clearHistory = () => {
+        window.history.replaceState({}, document.title)
+
+    }
+    const [titleText, setTitleText] = useState('')
     useEffect(() => {
+
+        if (location.state && location.state.from === '/roomportal') {
+            socket.emit("create-or-join-room", {
+                username: location.state.username,
+                roomId: location.state.roomId,
+            });
+
+            clearHistory()
+
+        } else {
+            clearHistory()
+
+            socket.emit('connection-lost')
+
+        }
+
         socket.on("invalid-room", () => {
             toast.error("Room doesnt exist");
         });
 
+        socket.on('connection-lost', () => {
+            setTimeout(() => {
+                toast.error('Connection lost, going back :(')
+                setTimeout(() => {
+                    navigate('/roomportal')
+
+                }, 1000)
+            }, 30)
+        })
         socket.on("room-created", () => {
             toast.error("Room created! ask your friend to join!");
         });
         socket.on("room-full", () => {
             toast.error("Room full, cannot join");
         });
-        socket.on("fire", () => {
-            toast.success("fired");
-        });
 
-        socket.on("start-game", () => {
+        socket.on("start-game", (usernames) => {
+            setTitleText(usernames.join(' X ').toUpperCase())
             setStartGame(true);
-            toast.success("Lets gooo");
+            const audio = new Audio()
+            audio.src = gameBeginSound
+            audio.play()
+
+            //toast to notify which player to go first
+
+            setTimeout(() => {
+                toast.success(`Player ${currentUserIcon} First!`);
+            }, 30);
         });
     }, []);
 
@@ -58,12 +100,6 @@ const MultiPlayer = () => {
         winningCells: null,
     });
 
-    //toast to notify which player to go first
-    useEffect(() => {
-        setTimeout(() => {
-            toast.success(`Player ${currentUserIcon} First!`);
-        }, 30);
-    }, []);
 
     //each time a cell state is changed check for win/draw
     useEffect(() => {
@@ -112,8 +148,7 @@ const MultiPlayer = () => {
             return true;
         } else return false;
     };
-    const [roomId, setRoomId] = useState(null);
-    const [username, setUsername] = useState(null);
+
 
     //function to change a cells state by id;passed to each cell
     const changeCellState = (id, newstate) => {
@@ -131,19 +166,16 @@ const MultiPlayer = () => {
     if (startGame) {
         return (
             <>
-                <h4>{username}</h4>
                 <div className="main-container">
                     <h1
-                        onClick={() => {
-                            socket.emit("fire");
-                        }}
+
                         className="game-title"
                     >
                         {gameState.gameOver
                             ? gameState.winner === "none"
                                 ? "Draw"
                                 : `Player ${gameState.winner} Wins`
-                            : "Tic Tac Toe"}
+                            : `${titleText}`}
                     </h1>
                     <div className="game-container">
                         {cells.map((cell) => (
@@ -177,44 +209,13 @@ const MultiPlayer = () => {
     } else {
         return (
             <>
-                <label htmlFor="Join Room">Create\Join room</label>
-                <br />
-                <input
-                    onChange={(e) => {
-                        setUsername(e.target.value);
-                    }}
-                    type="text"
-                    placeholder="Enter username"
-                    name=""
-                    id=""
-                />
-                <br />
-                <input
-                    onChange={(e) => {
-                        setRoomId(e.target.value);
-                    }}
-                    type="text"
-                    placeholder="Enter room code"
-                    name=""
-                    id=""
-                />
-                <br />
-                <button
-                    onClick={() => {
-                        if (!(username && roomId)) {
-                            toast.error("Username and room id is required");
-                            return;
-                        }
-                        socket.emit("create-or-join-room", {
-                            username,
-                            roomId,
-                        });
-                    }}
-                >
-                    Create
-                </button>
+                <BallTriangle></BallTriangle>
+                <h1 style={{
+                    marginTop: 15
+                }}>Waiting for another player to join</h1>
             </>
-        );
+
+        )
     }
 };
 

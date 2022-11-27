@@ -34,15 +34,8 @@ body {
 }
 
 @media only screen and (min-width: 800px) {
-  .btn-X-icon {
-    height: 90px;
-    width: 90px;
-  }
 
-  .btn-O-icon {
-    height: 60px;
-    width: 60px;
-  }
+
   .game-title {
     font-size: 2.4rem;
   }
@@ -64,10 +57,6 @@ body {
     justify-content: center;
     background-color: #263238;
   }
-}
-
-.cell:not(.cell.btn-X, .cell.btn-O):hover {
-  background-color: #1d2d2d;
 }
 
 .main-container {

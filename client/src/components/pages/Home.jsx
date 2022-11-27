@@ -5,14 +5,16 @@ const Home = () => {
     const navigate = useNavigate()
     return (
         <>
-            <h1>Select Game Mode</h1>
+            <h1 style={{
+                color: "greenyellow"
+            }}>Select Game Mode</h1>
             <div className="game-modes-container">
                 <div className="game-mode-solo" onClick={() => {
                     navigate('/singleplayer')
                 }}><h3>Solo</h3></div>
                 <div className="game-mode-online" onClick={() => {
                     // toast.error('This mode is in development')
-                    navigate('/multiplayer')
+                    navigate('/roomportal')
                 }}><h3>Online</h3></div>
             </div>
         </>

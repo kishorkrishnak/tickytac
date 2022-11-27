@@ -12,7 +12,3 @@
     width: 150px;
   }
 }
-
-.cell:not(.cell.btn-X, .cell.btn-O):hover {
-  background-color: #1d2d2d !important;
-}
