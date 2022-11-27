@@ -14,11 +14,7 @@ function App() {
             <Route exact path="/singleplayer" element={<SinglePlayer />} />
 
             <Route exact path="/multiplayer" element={<MultiPlayer />} />
-            <Route
-              exact
-              path="/roomportal"
-              element={<RoomPortal/>}
-            ></Route>
+            <Route exact path="/roomportal" element={<RoomPortal />}></Route>
             <Route exact path="/" element={<Home />} />
           </Routes>
         </>

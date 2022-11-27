@@ -6,7 +6,6 @@
 body {
   background-color: #0f0617;
   align-items: center;
-
   min-height: 100vh;
   font-family: "Poppins", sans-serif;
 }
@@ -36,15 +35,6 @@ body {
   width: 46px;
 }
 @media only screen and (min-width: 800px) {
-  .btn-X-icon {
-    height: 90px;
-    width: 90px;
-  }
-
-  .btn-O-icon {
-    height: 60px;
-    width: 60px;
-  }
   .game-title {
     font-size: 2.4rem;
   }
@@ -84,8 +74,6 @@ body {
 
 .credits-div {
   color: white;
-  position: absolute;
-  bottom: 0;
   border: 1px sold cyan;
   text-align: center;
   font-size: 1.2rem;

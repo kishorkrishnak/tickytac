@@ -20,35 +20,34 @@
   gap: 8px;
 }
 
-.portal input{
-    width: 100%;
-    padding-top: 15px;
-    padding-bottom: 15px;padding-right: 100px;
-    padding-left: 20px;
-    
-    outline: none;
-    border: none;
-    border-radius: 5px;
+.portal input {
+  width: 100%;
+  padding-top: 15px;
+  padding-bottom: 15px;
+  padding-right: 100px;
+  padding-left: 20px;
+
+  outline: none;
+  border: none;
+  border-radius: 5px;
 }
 
-
-.portal button{
-    outline: none;
-    color:white;
-    border: none;
-    background-color: #fc4747;
-    padding: 12px 18px;
-    border-radius: 5px;
+.portal button {
+  outline: none;
+  color: white;
+  border: none;
+  background-color: #fc4747;
+  padding: 12px 18px;
+  border-radius: 5px;
 }
 
-.portal h1{
-    padding: 0;
-    margin: 0;
+.portal h1 {
+  padding: 0;
+  margin: 0;
 }
 
-
-.portal div{
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
+.portal div {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
 }

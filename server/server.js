@@ -5,7 +5,9 @@ const io = require("socket.io")(3001, {
     origin: clientUrl,
   },
 });
-
+const randomFirstTurn = () => {
+  return Math.floor(Math.random() * 3) === 0 ? "X" : "O";
+};
 const rooms = {};
 io.on("connection", (socket) => {
   socket.on("create-or-join-room", ({ username, roomId }) => {
@@ -23,20 +25,22 @@ io.on("connection", (socket) => {
     if (room.users.length > 1) {
       io.to(socket.id).emit("room-full");
     } else {
-      socket.on("fire", () => {
-        io.to(room.id).emit("fire");
-      });
       const user = { id: socket.id, name: username, socket };
       room.users.push(user);
       socket.join(room.id);
     }
 
     if (room.users.length === 2) {
-      io.to(room.id).emit("start-game");
+      io.to(room.id).emit("start-game", {
+        usernames: [room.users[0].name, room.users[1].name],
+        firstTurn: randomFirstTurn(),
+      });
     }
 
+    socket.on("player-move", () => {});
+
     socket.on("disconnect", (socket) => {
-      console.log("dis");
+      io.to(room.id).emit("terminate-session");
       room.users = room.users.filter((user) => user.id === socket.id);
     });
   });
