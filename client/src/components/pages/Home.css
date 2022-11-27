@@ -1,0 +1,46 @@
+body {
+  background-color: #0f0617;
+  display: flex;
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  flex-direction: column;
+}
+.game-modes-container {
+  display: flex;
+  gap: 30px;
+  margin-top: 20px;
+}
+.game-mode-solo:hover,
+.game-mode-online:hover {
+  transform: scale(1.03);
+}
+.game-mode-solo,
+.game-mode-online {
+  border: 1px solid cyan;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px;
+  cursor: pointer;
+
+  background-image: url("https://cdn-icons-png.flaticon.com/512/38/38600.png");
+  height: 250px;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  width: 250px;
+}
+
+.game-mode-online {
+  background-image: url("https://cdn-icons-png.flaticon.com/512/119/119686.png");
+}
+
+@media (max-width: 800px) {
+  .game-mode-solo,
+  .game-mode-online {
+    height: 150px;
+    width: 150px;
+  }
+}

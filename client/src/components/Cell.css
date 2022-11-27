@@ -1,0 +1,18 @@
+.cell {
+  height: 100px;
+  width: 100px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+@media only screen and (min-width: 800px) {
+  .cell {
+    height: 150px;
+    width: 150px;
+  }
+}
+
+.cell:not(.cell.btn-X, .cell.btn-O):hover {
+  background-color: #1d2d2d !important;
+}

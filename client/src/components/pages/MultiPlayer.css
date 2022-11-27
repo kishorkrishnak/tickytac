@@ -1,0 +1,121 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap");
+* {
+  margin: 0;
+  box-sizing: border-box;
+}
+body {
+  background-color: #0f0617;
+  align-items: center;
+
+  min-height: 100vh;
+  font-family: "Poppins", sans-serif;
+}
+.game-title {
+  color: #ffeb3b;
+  font-size: bold;
+  font-size: 2rem;
+}
+.game-container {
+  text-align: center;
+  display: grid;
+  width: 310px;
+  gap: 3px;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+}
+
+.cell {
+  height: 100px;
+  width: 100px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #263238;
+}
+
+@media only screen and (min-width: 800px) {
+  .btn-X-icon {
+    height: 90px;
+    width: 90px;
+  }
+
+  .btn-O-icon {
+    height: 60px;
+    width: 60px;
+  }
+  .game-title {
+    font-size: 2.4rem;
+  }
+  .game-container {
+    text-align: center;
+    display: grid;
+    width: 460px;
+    height: 460px;
+    gap: 3px;
+    grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+  }
+
+  .cell {
+    height: 150px;
+    width: 150px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #263238;
+  }
+}
+
+.cell:not(.cell.btn-X, .cell.btn-O):hover {
+  background-color: #1d2d2d;
+}
+
+.main-container {
+  gap: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+@media only screen and (max-width: 350px) {
+  .main-container {
+    transform: scale(0.85);
+  }
+}
+@media only screen and (max-width: 300px) {
+  .main-container {
+    transform: scale(0.75);
+  }
+}
+.btn-restart:hover {
+  transform: scale(1.05);
+}
+
+.credits-div {
+  color: white;
+  position: absolute;
+  bottom: 0;
+  border: 1px sold cyan;
+  text-align: center;
+  font-size: 1.2rem;
+  padding: 15px;
+}
+.credits {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px;
+}
+.credits svg {
+  margin-bottom: 2px;
+}
+
+.credits a {
+  text-decoration: none;
+  font-family: Arial, Helvetica, sans-serif;
+
+  color: white;
+  font-size: 1.2rem;
+}
