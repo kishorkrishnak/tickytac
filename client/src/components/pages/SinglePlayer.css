@@ -14,7 +14,7 @@ body {
   font-size: bold;
   font-size: 2rem;
 }
-.game-container {
+.game-grid {
   text-align: center;
   display: grid;
   width: 310px;
@@ -37,7 +37,7 @@ body {
   .game-title {
     font-size: 2.4rem;
   }
-  .game-container {
+  .game-grid {
     text-align: center;
     display: grid;
     width: 460px;

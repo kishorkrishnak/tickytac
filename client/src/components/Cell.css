@@ -1,4 +1,4 @@
-.cell {
+.game-grid-cell {
   height: 100px;
   width: 100px;
   border-radius: 5px;
@@ -7,8 +7,8 @@
   justify-content: center;
 }
 @media only screen and (min-width: 800px) {
-  .cell {
-    height: 150px;
-    width: 150px;
+  .game-grid-cell {
+    height: 130px;
+    width: 130px;
   }
 }

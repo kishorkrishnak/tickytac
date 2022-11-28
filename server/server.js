@@ -23,7 +23,7 @@ io.on("connection", (socket) => {
     if (room.users.length > 1) {
       io.to(socket.id).emit("room-full");
     } else {
-      const user = { id: socket.id, name: username, socket };
+      const user = { id: socket.id, name: username, score: 0, socket };
       room.users.push(user);
       socket.join(room.id);
     }
@@ -33,7 +33,7 @@ io.on("connection", (socket) => {
     if (room.users.length === 2) {
       const usernames = [room.users[0].name, room.users[1].name];
       const firstTurn = usernames[randomFirstTurn()];
-      const gameInfo = {
+      let gameInfo = {
         //randomize mark later
         players: [
           {
@@ -46,12 +46,27 @@ io.on("connection", (socket) => {
             name: usernames[1],
             mark: "O",
             priority: "player2",
-            score: 2,
+            score: 0,
           },
         ],
         firstTurn,
       };
       io.to(room.id).emit("start-game", gameInfo);
+
+      socket.on("increase-score-and-restart", (winner) => {
+        const firstTurn = usernames[randomFirstTurn()];
+
+        gameInfo = {
+          players: gameInfo.players.map((player) =>
+            player.name === winner
+              ? { ...player, score: player.score + 1 }
+              : player
+          ),
+          firstTurn,
+        };
+
+        io.to(room.id).emit("increase-score-and-restart", gameInfo);
+      });
     }
 
     socket.on("player-move", ({ cells, id, newstate }) => {

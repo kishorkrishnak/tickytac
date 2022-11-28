@@ -25,6 +25,25 @@ const MultiPlayer = () => {
     { id: 8, state: "initial" },
     { id: 9, state: "initial" },
   ]);
+  const resetGame = () => {
+    setCells([
+      { id: 1, state: "initial" },
+      { id: 2, state: "initial" },
+      { id: 3, state: "initial" },
+      { id: 4, state: "initial" },
+      { id: 5, state: "initial" },
+      { id: 6, state: "initial" },
+      { id: 7, state: "initial" },
+      { id: 8, state: "initial" },
+      { id: 9, state: "initial" },
+    ]);
+
+    setGameState({
+      gameOver: false,
+      winner: "none",
+      winningCells: null,
+    });
+  };
 
   // state to keep track of weather game ended,and if so,winners, winning cells
   const [gameState, setGameState] = useState({
@@ -35,7 +54,7 @@ const MultiPlayer = () => {
 
   const [players, setPlayers] = useState([]);
   const [userName, setUserName] = useState(null);
-  const [opponentName, setOpponentName] = useState("");
+  const [opponent, setOpponent] = useState(null);
   const [me, setMe] = useState(null);
   const [currentTurn, setCurrentTurn] = useState("");
   const [startGame, setStartGame] = useState(false);
@@ -95,7 +114,9 @@ const MultiPlayer = () => {
       const audio = new Audio();
       audio.src = winSound;
       audio.play();
+      console.log("win");
 
+      socket.emit("increase-score-and-restart", currentTurn);
       setGameState({
         gameOver: true,
         winner,
@@ -112,16 +133,29 @@ const MultiPlayer = () => {
     socket.emit("toggle-turn", players);
   };
 
-  //reset game to original state
-  const resetGame = () => {};
-
   useEffect(() => {
     if (players && players.length > 0) {
-      let me = players[0].name === userName ? players[0] : players[1];
-      setMe(me);
+      let username = location.state.username;
+      let oppo = players[0].name !== username ? players[0] : players[1];
+
+      let me = players[0].name === username ? players[0] : players[1];
+      setMe(me); // let me = players[0].name === userName ? players[0] : players[1];
+      setOpponent(oppo);
+
+      setTimeout(() => {
+        toast.success(`Player ${currentTurn} First!`);
+      }, 30);
     }
   }, [players]);
 
+  useEffect(() => {
+    let titleText = `${me?.score} Vs ${opponent?.score}`;
+    setTitleText(titleText);
+    setStartGame(true);
+    const audio = new Audio();
+    audio.src = gameBeginSound;
+    audio.play();
+  }, [opponent, me]);
   useEffect(() => {
     if (location.state && location.state.from === "/roomportal") {
       setUserName(location.state.username);
@@ -138,21 +172,9 @@ const MultiPlayer = () => {
 
     socket.on("start-game", ({ players, firstTurn }) => {
       setPlayers(players);
-      let username = location.state.username;
-      let opponent = players[0].name !== username ? players[0] : players[1];
 
-      let me = players[0].name === username ? players[0] : players[1];
-      setMe(me); // let me = players[0].name === userName ? players[0] : players[1];
-      setOpponentName(opponent.name);
       setCurrentTurn(firstTurn);
-      let titleText = `${me?.score} Vs ${opponent?.score}`;
-      setTitleText(titleText);
-      setStartGame(true);
-      const audio = new Audio();
-      audio.src = gameBeginSound;
-      audio.play();
 
-      // toast to notify which player to go first
       setTimeout(() => {
         toast.success(`Player ${currentTurn} First!`);
       }, 30);
@@ -168,6 +190,10 @@ const MultiPlayer = () => {
       );
     });
 
+    socket.on("increase-score", (updatedusers) => {
+      console.log(updatedusers);
+      setPlayers([...updatedusers]);
+    });
     socket.on("room-created", () => {
       setTimeout(() => {
         toast.success("Room created! ask your friend to join!");
@@ -175,6 +201,15 @@ const MultiPlayer = () => {
     });
     socket.on("room-full", () => {
       toast.error("Room full, cannot join");
+    });
+    socket.on("increase-score-and-restart", ({ players, firstTurn }) => {
+      toast.success("Game will restart in 5 seconds");
+      setTimeout(() => {
+        resetGame();
+        setPlayers([...players]);
+
+        setCurrentTurn(firstTurn);
+      }, 5000);
     });
 
     socket.on("player-move", (updatedcells) => {
@@ -189,6 +224,7 @@ const MultiPlayer = () => {
       socket.off("terminate-session");
       socket.off("player-move");
       socket.off("toggle-turn");
+      socket.off("increase-score-and-restart");
     };
   }, []);
 
@@ -266,10 +302,10 @@ const MultiPlayer = () => {
                 alt="player2 avatar"
                 height={80}
               />
-              <span>{opponentName}</span>
+              <span>{opponent.name}</span>
             </div>
           </h1>
-          <div className="game-container">
+          <div className="game-grid">
             {cells.map((cell) => (
               <Cell
                 currentTurn={currentTurn}

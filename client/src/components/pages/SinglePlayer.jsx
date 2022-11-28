@@ -114,7 +114,7 @@ const SinglePlayer = () => {
               : `Player ${gameState.winner} Wins 🥇`
             : "Tic Tac Toe"}
         </h1>
-        <div className="game-container">
+        <div className="game-grid">
           {cells.map((cell) => (
             <Cell
               gameState={gameState}

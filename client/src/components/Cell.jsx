@@ -43,7 +43,7 @@ const Cell = ({
         }
         changeCellState(id, me.mark);
       }}
-      className="cell"
+      className="game-grid-cell"
     >
       {state !== "initial" && (
         <img src={state === "X" ? XImage : OImage} alt="mark" height={60} />
