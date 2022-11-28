@@ -11,9 +11,18 @@ body {
   font-family: "Poppins", sans-serif;
 }
 .game-title {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  justify-content: space-between;
+  width: 390px;
   color: #ffeb3b;
   font-size: bold;
   font-size: 2rem;
+}
+
+.game-title span {
+  font-size: 22px;
 }
 .game-container {
   text-align: center;
@@ -33,24 +42,29 @@ body {
   background-color: #263238;
 }
 
+@media only screen and (max-width: 800px) {
+  .game-title {
+    width: 300px;
+  }
+}
+
 @media only screen and (min-width: 800px) {
-
-
   .game-title {
     font-size: 2.4rem;
   }
   .game-container {
     text-align: center;
     display: grid;
-    width: 460px;
-    height: 460px;
+    width: 400px;
+    height: 400px;
+
     gap: 3px;
-    grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(125px, 1fr));
   }
 
   .cell {
-    height: 150px;
-    width: 150px;
+    height: 130px;
+    width: 130px;
     border-radius: 5px;
     display: flex;
     align-items: center;

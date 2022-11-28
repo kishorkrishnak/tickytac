@@ -1,21 +1,23 @@
-import { useState } from "react";
-import bg from "../../assets/images/bg.jpg";
-import { toast } from "react-hot-toast";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import roomportalbg from "../../assets/images/roomportalbg.jpg";
+import { toast } from "react-hot-toast";
 import "./RoomPortal.css";
-import { useEffect } from "react";
+
 const RoomPortal = () => {
-  const navigate = useNavigate();
   const [roomId, setRoomId] = useState(null);
   const [username, setUsername] = useState(null);
+  const navigate = useNavigate();
+
   useEffect(() => {
     toast.success("Enter your name and room code.", {
       duration: 3000,
     });
   }, []);
+
   return (
     <div className="portal-wrapper">
-      <img src={bg} alt="" className="portal-wrapper-bg" />
+      <img src={roomportalbg} alt="" className="portal-wrapper-bg" />
       <div className="portal">
         <h1> Create/Join room</h1>
         <div>
@@ -25,8 +27,6 @@ const RoomPortal = () => {
             }}
             type="text"
             placeholder="Enter username"
-            name=""
-            id=""
           />
           <input
             onChange={(e) => {
@@ -34,8 +34,6 @@ const RoomPortal = () => {
             }}
             type="text"
             placeholder="Enter room code"
-            name=""
-            id=""
           />
         </div>
         <button

@@ -5,16 +5,15 @@ import SinglePlayer from "./components/pages/SinglePlayer";
 import MultiPlayer from "./components/pages/MultiPlayer";
 import RoomPortal from "./components/pages/RoomPortal";
 import { Toaster } from "react-hot-toast";
-function App() {
+const App = () => {
   return (
     <div className="App">
       <BrowserRouter>
         <>
           <Routes>
             <Route exact path="/singleplayer" element={<SinglePlayer />} />
-
             <Route exact path="/multiplayer" element={<MultiPlayer />} />
-            <Route exact path="/roomportal" element={<RoomPortal />}></Route>
+            <Route exact path="/roomportal" element={<RoomPortal />} />
             <Route exact path="/" element={<Home />} />
           </Routes>
         </>
@@ -27,6 +26,6 @@ function App() {
       ></Toaster>
     </div>
   );
-}
+};
 
 export default App;

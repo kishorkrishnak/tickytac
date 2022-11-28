@@ -39,10 +39,14 @@ io.on("connection", (socket) => {
           {
             name: usernames[0],
             mark: "X",
+            priority: "player1",
+            score: 0,
           },
           {
             name: usernames[1],
             mark: "O",
+            priority: "player2",
+            score: 2,
           },
         ],
         firstTurn,
@@ -61,9 +65,10 @@ io.on("connection", (socket) => {
       io.to(room.id).emit("player-move", updatedcells);
     });
 
-    socket.on("toggle-turn", () => {
-      io.to(room.id).emit("toggle-turn");
+    socket.on("toggle-turn", (players) => {
+      io.to(room.id).emit("toggle-turn", players);
     });
+
     socket.on("disconnect", (socket) => {
       io.to(room.id).emit("terminate-session");
       room.users = room.users.filter((user) => user.id === socket.id);

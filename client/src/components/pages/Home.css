@@ -12,10 +12,12 @@ body {
   gap: 30px;
   margin-top: 20px;
 }
+
 .game-mode-solo:hover,
 .game-mode-online:hover {
   transform: scale(1.03);
 }
+
 .game-mode-solo,
 .game-mode-online {
   border: 1px solid cyan;
@@ -24,7 +26,6 @@ body {
   justify-content: center;
   border-radius: 5px;
   cursor: pointer;
-
   background-image: url("https://cdn-icons-png.flaticon.com/512/38/38600.png");
   height: 250px;
   background-position: center;

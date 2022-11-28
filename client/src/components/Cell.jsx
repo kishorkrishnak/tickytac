@@ -1,7 +1,7 @@
+import "./Cell.css";
 import XImage from "../assets/images/XImage.png";
 import OImage from "../assets/images/OImage.png";
 import { useState } from "react";
-import "./Cell.css";
 import toast from "react-hot-toast";
 const Cell = ({
   gameState,

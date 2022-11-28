@@ -3,16 +3,24 @@
   width: 100vw;
   height: 100vh;
   align-items: center;
+  padding: 10px;
   justify-content: center;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+    url("../../assets/images/roomportalbg.jpg");
 }
 
 .portal-wrapper-bg {
-  width: 40%;
+  width: 55%;
+  display: none;
   height: 100%;
+  filter: brightness(40%);
 }
 
 .portal {
-  width: 100%;
+  width: 45%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -50,4 +58,13 @@
   display: flex;
   flex-direction: column;
   gap: 5px;
+}
+
+@media (max-width: 800px) {
+  .portal-wrapper-bg {
+    display: none;
+  }
+  .portal {
+    width: 100%;
+  }
 }
