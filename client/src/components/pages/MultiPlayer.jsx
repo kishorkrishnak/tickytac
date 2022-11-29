@@ -13,7 +13,6 @@ import winSound from "../../assets/audios/winsound.mp3";
 import loseSound from "../../assets/audios/losesound.mp3";
 import drawSound from "../../assets/audios/drawsound.mp3";
 
-
 import backbutton2 from "../../assets/images/backbutton2.svg";
 import { useRef } from "react";
 
@@ -103,7 +102,10 @@ const MultiPlayer = () => {
       const audio = new Audio();
       audio.src = drawSound;
       audio.play();
-      socket.emit("restart-game");
+      if (currentTurn === me.name || location.state.username) {
+        socket.emit("restart-game");
+      }
+
       setGameState({
         gameOver: true,
         winner: "none",
@@ -123,8 +125,9 @@ const MultiPlayer = () => {
       const audio = new Audio();
       audio.src = currentTurn === me.name ? winSound : loseSound;
       audio.play();
-
-      socket.emit("increase-score-and-restart", currentTurn);
+      if (currentTurn === me.name || location.state.username) {
+        socket.emit("increase-score-and-restart", currentTurn);
+      }
       setGameState({
         gameOver: true,
         winner,
@@ -160,13 +163,6 @@ const MultiPlayer = () => {
       audio.src = gameBeginSound;
 
       audio.play();
-      setTimeout(() => {
-        if (currentTurn === me.name) {
-          toast.success(`Your turn first!`);
-        } else {
-          toast.success(`Player ${currentTurn} goes first!`);
-        }
-      }, 30);
     }
   }, [opponent, me]);
 
@@ -303,9 +299,7 @@ const MultiPlayer = () => {
               {gameState.gameOver && gameState.winner === "none" && "Draw"}
               {gameState.gameOver && gameState.winner !== "none" && (
                 <p className="game-header-winner">
-                  {gameState.winner === me.name
-                    ? "You Win 🥇"
-                    : `You lost :(`}
+                  {gameState.winner === me.name ? "You Win 🥇" : `You lost :(`}
                 </p>
               )}
 
