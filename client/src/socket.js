@@ -1,3 +1,3 @@
 import io from "socket.io-client";
-const clientUrl = "http://localhost:3001";
-export const socket = io(clientUrl);
+const serverUrl = "https://ticktacker.onrender.com/";
+export const socket = io(serverUrl);
