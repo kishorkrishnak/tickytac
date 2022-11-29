@@ -1,7 +1,7 @@
 const PORT = process.env.PORT || 3001;
 const io = require("socket.io")(PORT, {
   cors: {
-    origin: "https://ticktacker.vercel.app/",
+    origin: "*",
   },
 });
 
