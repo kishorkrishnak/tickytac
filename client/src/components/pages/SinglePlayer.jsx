@@ -1,9 +1,10 @@
-import "./SinglePlayer.css";
 import { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import Cell from "../Cell";
 import githubicon from "../../assets/images/github.svg";
 import reloadicon from "../../assets/images/reload.svg";
+import drawSound from "../../assets/audios/drawsound.mp3";
+import winSound from "../../assets/audios/winsound.mp3";
 
 const SinglePlayer = () => {
   //function to find weather X or O should go first
@@ -11,7 +12,7 @@ const SinglePlayer = () => {
     return Math.floor(Math.random() * 3) === 0 ? "X" : "O";
   };
 
-  const [currentUserIcon, setCurrentUserIcon] = useState(randomFirstTurn());
+  const [currentPlayerMark, setCurrentPlayerMark] = useState(randomFirstTurn());
 
   // initial cell states
   const [cells, setCells] = useState([
@@ -39,7 +40,7 @@ const SinglePlayer = () => {
   //toast to notify which player to go first
   useEffect(() => {
     setTimeout(() => {
-      toast.success(`Player ${currentUserIcon} First!`);
+      toast.success(`Player ${currentPlayerMark} First!`);
     }, 30);
   }, []);
 
@@ -61,9 +62,12 @@ const SinglePlayer = () => {
     if (compareCellTriplets(cells[0], cells[4], cells[8])) return;
     if (compareCellTriplets(cells[2], cells[4], cells[6])) return;
 
-    let isDraw =
+    const isDraw =
       !gameState.gameOver && cells.every((cell) => cell.state !== "initial");
     if (isDraw) {
+      const audio = new Audio();
+      audio.src = drawSound;
+      audio.play();
       toast.success("Game ended in a draw!");
       setGameState({
         gameOver: true,
@@ -80,8 +84,12 @@ const SinglePlayer = () => {
       cell2.state === cell3.state &&
       cell1.state !== "initial"
     ) {
-      let winner = cell1.state.toUpperCase();
+      const winner = cell1.state.toUpperCase();
       toast.success(`Player ${winner} wins! 🏆`);
+      const audio = new Audio();
+      audio.src = winSound;
+      audio.play();
+
       setGameState({
         gameOver: true,
         winner,
@@ -93,7 +101,7 @@ const SinglePlayer = () => {
 
   //function to change a cells state by id;passed to each cell
   const changeCellState = (id, newstate) => {
-    let updatedcells = cells.map((cell) => {
+    const updatedcells = cells.map((cell) => {
       if (cell.id === id) {
         return { ...cell, state: newstate };
       }
@@ -106,7 +114,7 @@ const SinglePlayer = () => {
 
   return (
     <>
-      <div className="main-container">
+      <div className="game-wrapper">
         <h1 className="game-title">
           {gameState.gameOver
             ? gameState.winner === "none"
@@ -120,13 +128,14 @@ const SinglePlayer = () => {
               gameState={gameState}
               id={cell.id}
               changeCellState={changeCellState}
-              setCurrentUserIcon={setCurrentUserIcon}
-              currentUserIcon={currentUserIcon}
+              setCurrentPlayerMark={setCurrentPlayerMark}
+              currentPlayerMark={currentPlayerMark}
               key={cell.id}
             />
           ))}
         </div>
         <img
+          className="reload-button"
           onClick={() => {
             window.location.reload();
           }}

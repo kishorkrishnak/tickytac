@@ -32,11 +32,10 @@ const Home = () => {
         <div
           className="game-mode-online"
           onClick={() => {
-            // toast.error('This mode is in development')
             navigate("/roomportal");
           }}
         >
-          <h3>Online</h3>
+          <h3>1 v 1 Online</h3>
         </div>
       </div>
     </>

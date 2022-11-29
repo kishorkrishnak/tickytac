@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import roomportalbg from "../../assets/images/roomportalbg.jpg";
 import { toast } from "react-hot-toast";
 import "./RoomPortal.css";
 
@@ -17,7 +16,6 @@ const RoomPortal = () => {
 
   return (
     <div className="portal-wrapper">
-      <img src={roomportalbg} alt="" className="portal-wrapper-bg" />
       <div className="portal">
         <h1> Create/Join room</h1>
         <div>
@@ -39,7 +37,7 @@ const RoomPortal = () => {
         <button
           onClick={() => {
             if (!(username && roomId)) {
-              toast.error("Username and room id is required :D");
+              toast.error("Username and room id is required");
               return;
             }
             navigate("/multiplayer", {

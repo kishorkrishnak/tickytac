@@ -1,13 +1,14 @@
 {
   "name": "server",
   "version": "1.0.0",
-  "description": "",
+  "description": "1v1 online tic tac toe game",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon server.js"
+    "devStart": "nodemon server.js",
+    "start": "node server.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "Kishor Krishna K",
   "license": "ISC",
   "dependencies": {
     "socket.io": "^4.5.4"

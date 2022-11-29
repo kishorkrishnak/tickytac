@@ -1,29 +1,43 @@
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap");
-* {
-  margin: 0;
-  box-sizing: border-box;
-}
-body {
-  background-color: #0f0617;
+.game-wrapper {
+  gap: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   align-items: center;
-
-  min-height: 100vh;
-  font-family: "Poppins", sans-serif;
 }
 .game-title {
+  color: greenyellow;
+}
+.game-header {
   display: flex;
-  gap: 20px;
   align-items: center;
   justify-content: space-between;
-  width: 390px;
+  width: 300px;
   color: #ffeb3b;
   font-size: bold;
-  font-size: 2rem;
 }
 
-.game-title span {
-  font-size: 22px;
+.game-header-player {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
 }
+
+.game-header-playername {
+  font-size: 18px;
+}
+.game-header-turn {
+  font-size: 1.1rem;
+}
+
+.avatar {
+  border-radius: 50%;
+
+  height: 70px;
+}
+
 .game-grid {
   text-align: center;
   display: grid;
@@ -31,52 +45,52 @@ body {
   gap: 3px;
   grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
 }
-
-
-
-@media only screen and (max-width: 800px) {
-  .game-title {
-    width: 300px;
-  }
+.game-waitingtext {
+  margin-top: 15px;
 }
-
+.game-waitingtext {
+  font-size: 1.5rem;
+}
 @media only screen and (min-width: 800px) {
   .game-title {
+    font-size: 2.4rem;
+  }
+  .game-waitingtext {
     font-size: 2.4rem;
   }
   .game-grid {
     text-align: center;
     display: grid;
-    width: 400px;
-    height: 400px;
+    width: 370px;
+    height: 370px;
 
     gap: 3px;
-    grid-template-columns: repeat(auto-fit, minmax(125px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
   }
-
- 
-}
-
-.main-container {
-  gap: 20px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
-@media only screen and (max-width: 350px) {
-  .main-container {
-    transform: scale(0.85);
+  .game-header {
+    width: 370px;
   }
-}
-@media only screen and (max-width: 300px) {
-  .main-container {
-    transform: scale(0.75);
+  .game-header-winner {
+    font-size: 1.8rem;
+  }
+  .game-header-score {
+    font-size: 2.4rem;
+  }
+  .game-header-turn {
+    font-size: 1.4rem;
+  }
+  .avatar {
+    height: 80px;
   }
 }
-.btn-restart:hover {
-  transform: scale(1.05);
+
+.reload-button {
+  margin-top: 5px;
+
+  transition: transform 0.7s ease-in-out;
+}
+.reload-button:hover {
+  transform: rotate(360deg);
 }
 
 .credits-div {

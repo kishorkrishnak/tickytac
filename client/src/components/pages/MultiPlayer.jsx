@@ -11,6 +11,10 @@ import Cell from "../Cell";
 import reloadicon from "../../assets/images/reload.svg";
 import gameBeginSound from "../../assets/audios/entergame.wav";
 import winSound from "../../assets/audios/winsound.mp3";
+import loseSound from "../../assets/audios/losesound.mp3";
+import drawSound from "../../assets/audios/drawsound.mp3";
+import backbutton from "../../assets/images/backbutton.svg";
+import backbutton2 from "../../assets/images/backbutton2.svg";
 
 const MultiPlayer = () => {
   // initial cell states
@@ -25,6 +29,8 @@ const MultiPlayer = () => {
     { id: 8, state: "initial" },
     { id: 9, state: "initial" },
   ]);
+
+  //reset all cell to unmarked and clear the game state
   const resetGame = () => {
     setCells([
       { id: 1, state: "initial" },
@@ -53,7 +59,6 @@ const MultiPlayer = () => {
   });
 
   const [players, setPlayers] = useState([]);
-  const [userName, setUserName] = useState(null);
   const [opponent, setOpponent] = useState(null);
   const [me, setMe] = useState(null);
   const [currentTurn, setCurrentTurn] = useState("");
@@ -89,11 +94,14 @@ const MultiPlayer = () => {
     if (compareCellTriplets(cells[0], cells[4], cells[8])) return;
     if (compareCellTriplets(cells[2], cells[4], cells[6])) return;
 
-    let isDraw =
+    const isDraw =
       !gameState.gameOver && cells.every((cell) => cell.state !== "initial");
 
     if (isDraw) {
-      toast.success("Game ended in a draw!");
+      const audio = new Audio();
+      audio.src = drawSound;
+      audio.play();
+      socket.emit("restart-game");
       setGameState({
         gameOver: true,
         winner: "none",
@@ -109,12 +117,10 @@ const MultiPlayer = () => {
       cell2.state === cell3.state &&
       cell1.state !== "initial"
     ) {
-      let winner = currentTurn.toUpperCase();
-      toast.success(`${winner} wins!`);
+      const winner = currentTurn;
       const audio = new Audio();
-      audio.src = winSound;
+      audio.src = currentTurn === me.name ? winSound : loseSound;
       audio.play();
-      console.log("win");
 
       socket.emit("increase-score-and-restart", currentTurn);
       setGameState({
@@ -135,11 +141,11 @@ const MultiPlayer = () => {
 
   useEffect(() => {
     if (players && players.length > 0) {
-      let username = location.state.username;
-      let oppo = players[0].name !== username ? players[0] : players[1];
+      const username = location.state.username;
+      const oppo = players[0].name !== username ? players[0] : players[1];
 
-      let me = players[0].name === username ? players[0] : players[1];
-      setMe(me); // let me = players[0].name === userName ? players[0] : players[1];
+      const me = players[0].name === username ? players[0] : players[1];
+      setMe(me);
       setOpponent(oppo);
 
       setTimeout(() => {
@@ -149,16 +155,22 @@ const MultiPlayer = () => {
   }, [players]);
 
   useEffect(() => {
-    let titleText = `${me?.score} Vs ${opponent?.score}`;
-    setTitleText(titleText);
-    setStartGame(true);
-    const audio = new Audio();
-    audio.src = gameBeginSound;
-    audio.play();
+    if (startGame) {
+      const titleText = `${me?.score} Vs ${opponent?.score}`;
+      setTitleText(titleText);
+      const audio = new Audio();
+      audio.src = gameBeginSound;
+
+      audio.play();
+    }
   }, [opponent, me]);
+
+  useEffect(() => {
+    checkForGameState();
+  }, [cells]);
+
   useEffect(() => {
     if (location.state && location.state.from === "/roomportal") {
-      setUserName(location.state.username);
       socket.emit("create-or-join-room", {
         username: location.state.username,
         roomId: location.state.roomId,
@@ -171,6 +183,8 @@ const MultiPlayer = () => {
     }
 
     socket.on("start-game", ({ players, firstTurn }) => {
+      setStartGame(true);
+
       setPlayers(players);
 
       setCurrentTurn(firstTurn);
@@ -185,14 +199,23 @@ const MultiPlayer = () => {
     });
 
     socket.on("toggle-turn", (players) => {
-      setCurrentTurn((prevTurn) =>
-        prevTurn === players[0].name ? players[1].name : players[0].name
-      );
+      if (!gameState.gameOver) {
+        setCurrentTurn((prevTurn) =>
+          prevTurn === players[0].name ? players[1].name : players[0].name
+        );
+      }
     });
 
-    socket.on("increase-score", (updatedusers) => {
-      console.log(updatedusers);
-      setPlayers([...updatedusers]);
+    socket.on("restart-game", ({ firstTurn, players }) => {
+      toast.success("Next round begins in 5 seconds", {
+        duration: 5000,
+      });
+      setTimeout(() => {
+        resetGame();
+        setPlayers([...players]);
+
+        setCurrentTurn(firstTurn);
+      }, 5000);
     });
     socket.on("room-created", () => {
       setTimeout(() => {
@@ -203,7 +226,9 @@ const MultiPlayer = () => {
       toast.error("Room full, cannot join");
     });
     socket.on("increase-score-and-restart", ({ players, firstTurn }) => {
-      toast.success("Game will restart in 5 seconds");
+      toast.success("Next round begins in 5 seconds", {
+        duration: 5000,
+      });
       setTimeout(() => {
         resetGame();
         setPlayers([...players]);
@@ -225,12 +250,9 @@ const MultiPlayer = () => {
       socket.off("player-move");
       socket.off("toggle-turn");
       socket.off("increase-score-and-restart");
+      socket.off("restart-game");
     };
   }, []);
-
-  useEffect(() => {
-    checkForGameState();
-  }, [cells]);
 
   return (
     <>
@@ -240,29 +262,30 @@ const MultiPlayer = () => {
       titleText &&
       currentTurn &&
       players.length > 0 ? (
-        <div className="main-container">
-          <h1 className="game-title">
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "5px",
-              }}
-            >
+        <div className="game-wrapper">
+          <h1 className="game-header">
+            <div className="game-header-player">
               <img
+                className="avatar"
                 src={me.priority === "player1" ? player1 : player2}
                 alt="player1 avatar"
-                height={80}
                 style={{
                   border:
-                    currentTurn === userName && !gameState.gameOver
-                      ? "1px solid gold"
+                    currentTurn === me.name && !gameState.gameOver
+                      ? "4px solid gold"
+                      : "none",
+
+                  boxShadow:
+                    currentTurn === me.name && !gameState.gameOver
+                      ? "0px 0px 15px gold"
+                      : "none",
+                  filter:
+                    currentTurn !== me.name && !gameState.gameOver
+                      ? "brightness(50%)"
                       : "none",
                 }}
               />
-              <span>{userName}</span>
+              <p className="game-header-playername">{me.name}</p>
             </div>
             <div
               style={{
@@ -270,49 +293,56 @@ const MultiPlayer = () => {
                 flexDirection: "column",
               }}
             >
-              {gameState.gameOver
-                ? gameState.winner === "none"
-                  ? "Draw"
-                  : `${gameState.winner} Wins 🥇`
-                : `${titleText}`}
+              {!gameState.gameOver && (
+                <p className="game-header-score">{titleText}</p>
+              )}
+              {gameState.gameOver && gameState.winner === "none" && "Draw"}
+              {gameState.gameOver && gameState.winner !== "none" && (
+                <p className="game-header-winner">
+                  {gameState.winner === me.name
+                    ? "You Win 🥇"
+                    : `${gameState.winner} Wins 🥇`}
+                </p>
+              )}
 
-              {currentTurn === userName && !gameState.gameOver ? (
-                <h6>Your Turn</h6>
-              ) : (
-                <h6>Their Turn</h6>
+              {!gameState.gameOver && (
+                <p className="game-header-turn">
+                  {currentTurn === me.name ? "Your Turn" : "Their Turn"}
+                </p>
               )}
             </div>
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "5px",
-              }}
-            >
+            <div className="game-header-player">
               <img
+                className="avatar"
                 style={{
                   border:
-                    currentTurn !== userName && !gameState.gameOver
-                      ? "1px solid gold"
+                    currentTurn !== me.name && !gameState.gameOver
+                      ? "4px solid gold"
+                      : "none",
+                  boxShadow:
+                    currentTurn !== me.name && !gameState.gameOver
+                      ? "0px 0px 15px gold"
+                      : "none",
+                  filter:
+                    currentTurn === me.name && !gameState.gameOver
+                      ? "brightness(50%)"
                       : "none",
                 }}
                 src={me.priority === "player2" ? player1 : player2}
                 alt="player2 avatar"
-                height={80}
               />
-              <span>{opponent.name}</span>
+              <p className="game-header-playername">{opponent.name}</p>
             </div>
           </h1>
           <div className="game-grid">
             {cells.map((cell) => (
               <Cell
+                gamemode="multiplayer"
                 currentTurn={currentTurn}
                 gameState={gameState}
                 id={cell.id}
                 changeCellState={changeCellState}
-                username={userName}
+                userName={me.name}
                 key={cell.id}
                 me={me}
                 state={cell.state}
@@ -322,10 +352,13 @@ const MultiPlayer = () => {
           <img
             onClick={() => {
               window.location.reload();
+
+              clearHistory();
             }}
-            src={reloadicon}
+            src={backbutton2}
             height={40}
             alt="reload icon"
+            className="reload-button"
           />
           <footer className="credits-div">
             <h4 className="credits">
@@ -337,12 +370,8 @@ const MultiPlayer = () => {
       ) : (
         <>
           <BallTriangle></BallTriangle>
-          <h1
-            style={{
-              marginTop: 15,
-            }}
-          >
-            Waiting for another player to join
+          <h1 className="game-waitingtext">
+            Waiting for another player to join...
           </h1>
         </>
       )}
