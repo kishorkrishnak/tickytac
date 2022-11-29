@@ -31,7 +31,9 @@
 .game-header-turn {
   font-size: 1.1rem;
 }
-
+.game-roomid span{
+color: greenyellow;
+}
 .avatar {
   border-radius: 50%;
 

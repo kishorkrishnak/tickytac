@@ -8,13 +8,14 @@ import githubicon from "../../assets/images/github.svg";
 import player1 from "../../assets/images/player1.svg";
 import player2 from "../../assets/images/player2.svg";
 import Cell from "../Cell";
-import reloadicon from "../../assets/images/reload.svg";
 import gameBeginSound from "../../assets/audios/entergame.wav";
 import winSound from "../../assets/audios/winsound.mp3";
 import loseSound from "../../assets/audios/losesound.mp3";
 import drawSound from "../../assets/audios/drawsound.mp3";
-import backbutton from "../../assets/images/backbutton.svg";
+
+
 import backbutton2 from "../../assets/images/backbutton2.svg";
+import { useRef } from "react";
 
 const MultiPlayer = () => {
   // initial cell states
@@ -59,6 +60,7 @@ const MultiPlayer = () => {
   });
 
   const [players, setPlayers] = useState([]);
+  const playersRef = useRef(players);
   const [opponent, setOpponent] = useState(null);
   const [me, setMe] = useState(null);
   const [currentTurn, setCurrentTurn] = useState("");
@@ -136,21 +138,17 @@ const MultiPlayer = () => {
   //function to change a cells state by id;passed to each cell
   const changeCellState = (id, newstate) => {
     socket.emit("player-move", { cells, id, newstate });
-    socket.emit("toggle-turn", players);
   };
 
   useEffect(() => {
     if (players && players.length > 0) {
+      playersRef.current = players;
       const username = location.state.username;
-      const oppo = players[0].name !== username ? players[0] : players[1];
+      const opponent = players[0].name !== username ? players[0] : players[1];
 
       const me = players[0].name === username ? players[0] : players[1];
       setMe(me);
-      setOpponent(oppo);
-
-      setTimeout(() => {
-        toast.success(`Player ${currentTurn} First!`);
-      }, 30);
+      setOpponent(opponent);
     }
   }, [players]);
 
@@ -162,6 +160,13 @@ const MultiPlayer = () => {
       audio.src = gameBeginSound;
 
       audio.play();
+      setTimeout(() => {
+        if (currentTurn === me.name) {
+          toast.success(`Your turn first!`);
+        } else {
+          toast.success(`Player ${currentTurn} goes first!`);
+        }
+      }, 30);
     }
   }, [opponent, me]);
 
@@ -186,19 +191,17 @@ const MultiPlayer = () => {
       setStartGame(true);
 
       setPlayers(players);
+      playersRef.current = players;
 
       setCurrentTurn(firstTurn);
-
-      setTimeout(() => {
-        toast.success(`Player ${currentTurn} First!`);
-      }, 30);
     });
 
     socket.on("terminate-session", () => {
       handleConnectionLost();
     });
 
-    socket.on("toggle-turn", (players) => {
+    socket.on("toggle-turn", () => {
+      let players = playersRef.current;
       if (!gameState.gameOver) {
         setCurrentTurn((prevTurn) =>
           prevTurn === players[0].name ? players[1].name : players[0].name
@@ -213,6 +216,7 @@ const MultiPlayer = () => {
       setTimeout(() => {
         resetGame();
         setPlayers([...players]);
+        playersRef.current = players;
 
         setCurrentTurn(firstTurn);
       }, 5000);
@@ -238,7 +242,7 @@ const MultiPlayer = () => {
     });
 
     socket.on("player-move", (updatedcells) => {
-      setCells([...JSON.parse(JSON.stringify(updatedcells))]);
+      setCells([...updatedcells]);
     });
 
     //cleanup listeners
@@ -301,7 +305,7 @@ const MultiPlayer = () => {
                 <p className="game-header-winner">
                   {gameState.winner === me.name
                     ? "You Win 🥇"
-                    : `${gameState.winner} Wins 🥇`}
+                    : `You lost :(`}
                 </p>
               )}
 
@@ -370,9 +374,12 @@ const MultiPlayer = () => {
       ) : (
         <>
           <BallTriangle></BallTriangle>
-          <h1 className="game-waitingtext">
-            Waiting for another player to join...
-          </h1>
+          <h1 className="game-waitingtext">Waiting for a player...</h1>
+          {location?.state?.roomId && (
+            <h2 className="game-roomid">
+              ROOM ID: <span>{location.state.roomId}</span>
+            </h2>
+          )}
         </>
       )}
     </>

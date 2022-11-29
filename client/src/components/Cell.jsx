@@ -3,6 +3,8 @@ import XImage from "../assets/images/XImage.png";
 import OImage from "../assets/images/OImage.png";
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
+import cellClick from "../assets/audios/cellclick.mp3";
+import cellClickError from "../assets/audios/cellclickerror.mp3";
 const Cell = ({
   gameState,
   changeCellState,
@@ -46,11 +48,22 @@ const Cell = ({
               : "#263238",
         }}
         onClick={() => {
-          if (state !== "initial" || gameState.gameOver) return;
+          if (state !== "initial" || gameState.gameOver) {
+            const audio = new Audio();
+            audio.src = cellClickError;
+            audio.play();
+            return;
+          }
           if (currentTurn !== userName) {
+            const audio = new Audio();
+            audio.src = cellClickError;
+            audio.play();
             toast.error("Not your turn!");
             return;
           }
+          const audio = new Audio();
+          audio.src = cellClick;
+          audio.play();
           changeCellState(id, me.mark);
         }}
         className="game-grid-cell"
@@ -78,9 +91,16 @@ const Cell = ({
               : "#263238",
         }}
         onClick={() => {
-          if (currentMark !== "" || gameState.gameOver) return;
+          if (currentMark !== "" || gameState.gameOver) {
+            const audio = new Audio();
+            audio.src = cellClickError;
+            audio.play();
+            return;
+          }
           setCurrentMark(currentPlayerMark);
-
+          const audio = new Audio();
+          audio.src = cellClick;
+          audio.play();
           if (currentPlayerMark === "X") setCurrentPlayerMark("O");
           else setCurrentPlayerMark("X");
         }}

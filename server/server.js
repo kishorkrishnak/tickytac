@@ -93,11 +93,7 @@ io.on("connection", (socket) => {
         return cell;
       });
       io.to(room.id).emit("player-move", updatedcells);
-    });
-
-    //toggle the current turn
-    socket.on("toggle-turn", (players) => {
-      io.to(room.id).emit("toggle-turn", players);
+      io.to(room.id).emit("toggle-turn");
     });
 
     //remove socket from room when disconnected
