@@ -65,6 +65,8 @@ const MultiPlayer = () => {
   const [currentTurn, setCurrentTurn] = useState("");
   const [startGame, setStartGame] = useState(false);
   const [titleText, setTitleText] = useState("");
+  const [playerMoveRequestOnGoing, setPlayerMoveRequestOnGoing] =
+    useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -238,6 +240,7 @@ const MultiPlayer = () => {
     });
 
     socket.on("player-move", (updatedcells) => {
+      setPlayerMoveRequestOnGoing(false);
       setCells([...updatedcells]);
     });
 
@@ -344,6 +347,8 @@ const MultiPlayer = () => {
                 key={cell.id}
                 me={me}
                 state={cell.state}
+                playerMoveRequestOnGoing={playerMoveRequestOnGoing}
+                setPlayerMoveRequestOnGoing={setPlayerMoveRequestOnGoing}
               />
             ))}
           </div>

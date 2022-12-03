@@ -16,6 +16,8 @@ const Cell = ({
   gamemode,
   currentPlayerMark,
   setCurrentPlayerMark,
+  setPlayerMoveRequestOnGoing,
+  playerMoveRequestOnGoing,
 }) => {
   //state for giving apprporiate backgroundColor for cells
   const [isHovering, setIsHovering] = useState(false);
@@ -61,10 +63,16 @@ const Cell = ({
             toast.error("Not your turn!");
             return;
           }
+
+          if (playerMoveRequestOnGoing) {
+            return;
+          }
+
           const audio = new Audio();
           audio.src = cellClick;
           audio.play();
           changeCellState(id, me.mark);
+          setPlayerMoveRequestOnGoing(true);
         }}
         className="game-grid-cell"
       >
@@ -97,6 +105,7 @@ const Cell = ({
             audio.play();
             return;
           }
+
           setCurrentMark(currentPlayerMark);
           const audio = new Audio();
           audio.src = cellClick;
